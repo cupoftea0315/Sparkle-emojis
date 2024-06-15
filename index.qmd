@@ -1,0 +1,48 @@
+---
+title: "**Sparkle emojis**"
+author:
+  - "[cloud云纭](https://space.bilibili.com/1324985227?spm_id_from=333.976.0.0)"
+date: "`r Sys.Date()`"
+date-format: "YYYY.MM.DD"
+format: html
+toc: true
+toc-location: left
+---
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+library(base64enc)
+
+# define the pathway of files
+img_dir <- "./images"
+
+# set the illustrations type
+img_list <- list.files(path = img_dir, pattern = ".png|.jpg|.jpeg|.gif", full.names = TRUE)
+
+# sort the images
+img_list <- img_list[order(as.numeric(gsub(pattern = ".png|.jpg|.jpeg|.gif", "", gsub("./images/", "", img_list))))]
+
+# convert the images to base64 type
+embed_image <- function(path) {
+  img_data <- readBin(path, "raw", file.info(path)$size)
+  img_base64 <- base64encode(img_data)
+  sprintf('data:image/png;base64,%s', img_base64)
+}
+
+# put all the base64 code to HTML
+embed_images <- function(img_list) {
+  html <- ""
+  for (img_path in img_list) {
+    img_name <- basename(img_path)
+    img_base64 <- embed_image(img_path)
+    html <- paste(html, sprintf("<br><h5 style='text-align:center;'>%s</h5>", substr(img_name, 1, nchar(img_name)-4)))
+    html <- paste(html, sprintf("<img src='%s' alt='%s' style='display:block; margin:auto; max-height:100%%; max-width:100%%;'>", img_base64, img_name))
+  }
+  return(html)
+}
+
+# generate HTML code
+html <- embed_images(img_list)
+
+# output HTML code
+cat(sprintf("<html><head></head><body>%s</body></html>", html))
+```
